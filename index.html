@@ -149,10 +149,20 @@
             return [(-b - root) / 2, (-b + root) / 2];
         };
 
+        const getLineIntersection = (p1, p2, p3, p4) => {
+            const x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y;
+            const x3 = p3.x, y3 = p3.y, x4 = p4.x, y4 = p4.y;
+            const den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+            return {
+                x: ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / den,
+                y: ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / den
+            };
+        };
+
         const i18n = {
             zh: {
                 appTitle: '圓形幾何練習平台',
-                homeSelect: '選擇練習題型',
+                homeSelect: '選擇練習模式或題型',
                 homeType1: '等弦定理 (Equal Chords)',
                 homeType1Desc: '包含 5 條隨機生成的 MC 題目，需運用半徑、同頂角、圓心角等性質。',
                 homeType2: '圓心角與等腰三角形',
@@ -165,12 +175,24 @@
                 homeType5Desc: '包含 5 條隨機生成 MC 題，支援多種思路（三角形內角和 / 加入輔助線 QS）。',
                 homeType6: '割線、等腰與同弓形',
                 homeType6Desc: '包含 5 條隨機生成 MC 題，改編自公開試風格，需把外點割線、AC = CE、同弓形及角相加連成一條推理鏈。',
+                homeType7: '相交弦、割線與等腰三角形',
+                homeType7Desc: '包含 5 條隨機生成 MC 題，支援同弧圓周角、等腰三角形、三角形外角及三角形內角和等多種思路。',
+                homeType8: '平行弦、等弦與交弦角',
+                homeType8Desc: '包含 5 條隨機生成 MC 題，需運用內錯角、等弦對等角、等腰三角形及三角形外角。',
+                homeType9: '直徑、同弧與等弦',
+                homeType9Desc: '包含 5 條隨機生成 MC 題，改編自直徑公開試題型，需運用同弧所對的圓周角、半圓上的圓周角、三角形內角和及等弦對等角。',
+                homeType10: '直徑、同弧與等弦',
+                homeType10Desc: '包含 5 條隨機生成 MC 題，改編自直徑公開試題型，需運用同弧所對的圓周角、半圓上的圓周角、三角形內角和及等弦對等角。',
                 typeLabel1: '題型一',
                 typeLabel2: '題型二',
                 typeLabel3: '題型三',
                 typeLabel4: '題型四',
                 typeLabel5: '題型五',
                 typeLabel6: '題型六',
+                typeLabel7: '題型七',
+                typeLabel8: '題型八',
+                typeLabel9: '題型九',
+                typeLabel10: '題型十',
                 progress: '進度',
                 score: '得分',
                 givenStr: '若',
@@ -181,15 +203,30 @@
                 baseTextType4: <span>圖中，<span className="font-bold text-purple-700">AD 為圓 ABCDE 的一直徑</span>。</span>,
                 baseTextType5: <span>圖中，<span className="font-bold text-rose-700">PS 為圓 PQRST 的一直徑</span>。</span>,
                 baseTextType6: <span>圖中，<span className="font-bold text-teal-700">ABCD 為一圓，AD 及 BC 的延線相交於 E，且 AC = CE</span>。</span>,
+                baseTextType7: <span>圖中，<span className="font-bold text-cyan-700">PQRS 為一圓，PR 與 QS 相交於 T，PQ 及 SR 的延線相交於 U，且 PR = RU</span>。</span>,
+                baseTextType8: <span>圖中，<span className="font-bold text-indigo-700">圓 ABCD 的弦 AC 與弦 BD 相交於 E，且 AB = AD 及 AD // BC</span>。</span>,
+                baseTextType9: <span>圖中，<span className="font-bold text-lime-700">PS 為圓 PQRST 的一直徑，且 QR = RS</span>。</span>,
+                baseTextType10: <span>圖中，<span className="font-bold text-lime-700">PS 為圓 PQRST 的一直徑，且 QR = RS</span>。</span>,
                 toolbox: '概念解鎖器：',
                 selectAnswer: '選擇答案：',
                 nextBtn: '下一題',
                 finishBtn: '完成練習',
                 summaryTitle: '練習完成！',
                 summaryScore: '你的最終得分',
+                dseModeTitle: 'DSE 練習模式',
+                dseModeDesc: '一共 20 題，系統會隨機由題型一至題型九抽題，適合做綜合操練。',
+                dseModeCta: '開始 20 題綜合練習',
+                moduleSectionTitle: '分題型練習',
+                moduleSectionDesc: '每個題型各有 5 題隨機題，方便逐項訓練。',
+                practiceCount5: '5 題',
+                practiceCount20: '20 題',
                 backHome: '返回主頁',
                 hintStart: '提示：先觀察有沒有需要加「輔助線」。按住上方性質拖拉，紅光會指示正確位置！',
-                hintStartType6: '提示：先把 ∠CBD 設為 x，再用「同弧所對的圓周角」及「等腰三角形底角」逐步標示其他 x。',
+                hintStartType6: '提示：先把 ∠CBD 設為 x，再用「同弧所對的圓周角」及「等腰三角形底角」逐步標示其他 x。最後可用三角形內角和，或把「三角形外角」拖到 ∠ACE 來求 x。',
+                hintStartType7: '提示：先把 ∠PUR 設為 x，再用等腰三角形、同弧所對的圓周角建立關係。最後求 x 時，可以用「三角形外角」拖到 ∠PTS；亦可先用「直線上的鄰角」標示 ∠RTS，再用「三角形內角和」求 x。',
+                hintStartType8: '提示：先把 ∠ACB 設為 x，再用內錯角及等弦對等角逐步標示其他 x。最後可用三角形外角標示 ∠BEC。',
+                hintStartType9: '提示：先由 ∠PTR 用「同弧所對的圓周角」標示 ∠PSR，然後加入輔助線 PR。再用「半圓上的圓周角」找 ∠PRS = 90°，用三角形內角和找 ∠RPS，最後用 QR = RS 及角相加求 ∠QPS。',
+                hintStartType10: '提示：先由 ∠PTR 用「同弧所對的圓周角」標示 ∠PSR，然後加入輔助線 PR。再用「半圓上的圓周角」找 ∠PRS = 90°，用三角形內角和找 ∠RPS，最後用 QR = RS 及角相加求 ∠QPS。',
                 hintValid: '正確！已為你顯示該角的數值。',
                 hintAux: '輔助線加入成功！你現在可以計算其他隱藏的角度了。',
                 hintInvalid: '性質不適用！請觀察有沒有紅光提示，或者你需要先做上一個步驟。',
@@ -200,6 +237,7 @@
                     t_radii: '加入半徑',
                     t_line: '加入輔助線',
                     t_point: '同頂角',
+                    t_parallel: '內錯角',
                     t_chord: '等弦對等角',
                     t_iso: '等腰三角形底角',
                     t_tri_sum: '三角形內角和',
@@ -209,12 +247,13 @@
                     t_segment: '同弧所對的圓周角',
                     t_ext_tri: '三角形外角',
                     t_straight: '直線上的鄰角',
+                    t_intersect: '兩弦相交角',
                     t_adj: '角相加/減'
                 }
             },
             en: {
                 appTitle: 'Circle Geometry Platform',
-                homeSelect: 'Select Practice Module',
+                homeSelect: 'Choose a practice mode or module',
                 homeType1: 'Equal Chords Theorem',
                 homeType1Desc: '5 randomized MC questions requiring radii, angles at point, and center angles.',
                 homeType2: 'Angle at Center & Isosceles',
@@ -227,12 +266,24 @@
                 homeType5Desc: '5 randomized MC questions supporting multiple paths (triangle sum or auxiliary line QS).',
                 homeType6: 'Secants, Isosceles & Same Segment',
                 homeType6Desc: '5 randomized exam-style MC questions combining external secants, AC = CE, same-segment angles, and angle addition.',
+                homeType7: 'Intersecting Chords, Secants & Isosceles',
+                homeType7Desc: '5 randomized exam-style MC questions supporting same-segment angles, isosceles triangles, exterior angles, and triangle angle sums as alternative solution paths.',
+                homeType8: 'Parallel Chords, Equal Chords & Intersecting Chords',
+                homeType8Desc: '5 randomized exam-style MC questions combining alternate interior angles, equal chords, isosceles triangles, and exterior angles.',
+                homeType9: 'Diameter, Same Segment & Equal Chords',
+                homeType9Desc: '5 randomized exam-style MC questions combining same-segment angles, angles in a semicircle, triangle angle sums, and equal-chord angles.',
+                homeType10: 'Diameter, Same Segment & Equal Chords',
+                homeType10Desc: '5 randomized exam-style MC questions combining same-segment angles, angles in a semicircle, triangle angle sums, and equal-chord angles.',
                 typeLabel1: 'Type 1',
                 typeLabel2: 'Type 2',
                 typeLabel3: 'Type 3',
                 typeLabel4: 'Type 4',
                 typeLabel5: 'Type 5',
                 typeLabel6: 'Type 6',
+                typeLabel7: 'Type 7',
+                typeLabel8: 'Type 8',
+                typeLabel9: 'Type 9',
+                typeLabel10: 'Type 10',
                 progress: 'Progress',
                 score: 'Score',
                 givenStr: 'If',
@@ -243,15 +294,30 @@
                 baseTextType4: <span>In the figure, <span className="font-bold text-purple-700">AD is a diameter</span> of circle ABCDE.</span>,
                 baseTextType5: <span>In the figure, <span className="font-bold text-rose-700">PS is a diameter</span> of circle PQRST.</span>,
                 baseTextType6: <span>In the figure, <span className="font-bold text-teal-700">ABCD is a circle, AD and BC are extended to meet at E, and AC = CE</span>.</span>,
+                baseTextType7: <span>In the figure, <span className="font-bold text-cyan-700">PQRS is a circle, PR and QS meet at T, PQ and SR are extended to meet at U, and PR = RU</span>.</span>,
+                baseTextType8: <span>In the figure, <span className="font-bold text-indigo-700">chords AC and BD of circle ABCD meet at E, AB = AD, and AD // BC</span>.</span>,
+                baseTextType9: <span>In the figure, <span className="font-bold text-lime-700">PS is a diameter of circle PQRST, and QR = RS</span>.</span>,
+                baseTextType10: <span>In the figure, <span className="font-bold text-lime-700">PS is a diameter of circle PQRST, and QR = RS</span>.</span>,
                 toolbox: 'Theorems:',
                 selectAnswer: 'Select your answer:',
                 nextBtn: 'Next Question',
                 finishBtn: 'Finish Practice',
                 summaryTitle: 'Practice Completed!',
                 summaryScore: 'Your Final Score',
+                dseModeTitle: 'DSE Practice Mode',
+                dseModeDesc: '20 questions in total. Each question is randomly drawn from visible Type 1 to Type 9 modules for mixed practice.',
+                dseModeCta: 'Start 20-question mixed practice',
+                moduleSectionTitle: 'Practice by Module',
+                moduleSectionDesc: 'Each module contains 5 randomized questions for focused training.',
+                practiceCount5: '5 Qs',
+                practiceCount20: '20 Qs',
                 backHome: 'Back to Home',
                 hintStart: 'Hint: Do you need to "Add Aux Line"? Drag theorems from above. Red circles guide you!',
-                hintStartType6: 'Hint: Let ∠CBD be x first, then use same-segment angles and isosceles base angles to mark the other x angles.',
+                hintStartType6: 'Hint: Let ∠CBD be x first, then use same-segment angles and isosceles base angles to mark the other x angles. Finally, solve x using the triangle angle sum, or drag Exterior angle of triangle to ∠ACE.',
+                hintStartType7: 'Hint: Let ∠PUR be x first, then build the angle relationships using isosceles triangles and same-segment angles. To solve x, you may drag Exterior angle of triangle to ∠PTS, or mark ∠RTS with Adjacent angles on a straight line first and then use Angle sum of triangle.',
+                hintStartType8: 'Hint: Let ∠ACB be x first, then use alternate interior angles and equal chords to mark the other x angles. Finally, use the exterior angle of a triangle to mark ∠BEC.',
+                hintStartType9: 'Hint: Use same-segment angles from ∠PTR to mark ∠PSR, then add auxiliary line PR. Use the angle in a semicircle to mark ∠PRS = 90°, use the triangle angle sum to find ∠RPS, and finally use QR = RS plus angle addition to find ∠QPS.',
+                hintStartType10: 'Hint: Use same-segment angles from ∠PTR to mark ∠PSR, then add auxiliary line PR. Use the angle in a semicircle to mark ∠PRS = 90°, use the triangle angle sum to find ∠RPS, and finally use QR = RS plus angle addition to find ∠QPS.',
                 hintValid: 'Correct! The angle value has been unlocked.',
                 hintAux: 'Aux line added! You can now calculate other hidden angles.',
                 hintInvalid: 'Theorem not applicable! Check for red hints or if you missed a step.',
@@ -262,6 +328,7 @@
                     t_radii: 'Add Radii',
                     t_line: 'Add Aux Line',
                     t_point: 'Angles at a point',
+                    t_parallel: 'Alternate interior angles',
                     t_chord: 'Equal chords, equal angles',
                     t_iso: 'Base angles, isosceles triangle',
                     t_tri_sum: 'Angle sum of triangle',
@@ -271,19 +338,24 @@
                     t_segment: '∠s in the same segment',
                     t_ext_tri: 'Exterior angle of triangle',
                     t_straight: 'Adjacent angles on a straight line',
+                    t_intersect: 'Intersecting chords angle',
                     t_adj: 'Angle Addition/Subtraction'
                 }
             }
         };
 
-        const THEOREMS = ['t_radii', 't_line', 't_point', 't_chord', 't_iso', 't_tri_sum', 't_center', 't_cyclic', 't_semi', 't_segment', 't_ext_tri', 't_straight', 't_adj'];
-        const MAX_QUESTIONS = 5;
+        const THEOREMS = ['t_radii', 't_line', 't_point', 't_parallel', 't_chord', 't_iso', 't_tri_sum', 't_center', 't_cyclic', 't_semi', 't_segment', 't_ext_tri', 't_straight', 't_intersect', 't_adj'];
+        const PRACTICE_QUESTION_COUNT = 5;
+        const DSE_QUESTION_COUNT = 20;
+        const DSE_TYPE_POOL = [1, 2, 3, 4, 5, 6, 7, 8, 10];
 
         function App() {
             const [lang, setLang] = useState('zh');
             const [appState, setAppState] = useState('home');
             const [moduleType, setModuleType] = useState(1);
             const [qIndex, setQIndex] = useState(1);
+            const [practiceMode, setPracticeMode] = useState('module');
+            const [dseQueue, setDseQueue] = useState([]);
 
             const [qData, setQData] = useState(null);
             const [unlocked, setUnlocked] = useState({});
@@ -293,7 +365,15 @@
             const [feedback, setFeedback] = useState({ type: 'info', text: i18n['zh'].hintStart });
 
             const t = i18n[lang];
-            const getHintStart = (type = qData?.moduleType || moduleType) => type === 6 ? t.hintStartType6 : t.hintStart;
+            const totalQuestions = practiceMode === 'dse' ? DSE_QUESTION_COUNT : PRACTICE_QUESTION_COUNT;
+            const getHintStart = (type = qData?.moduleType || moduleType) => {
+                if (type === 6) return t.hintStartType6;
+                if (type === 7) return t.hintStartType7;
+                if (type === 8) return t.hintStartType8;
+                if (type === 9) return t.hintStartType9;
+                if (type === 10) return t.hintStartType10;
+                return t.hintStart;
+            };
 
             useEffect(() => {
                 if (appState === 'practice' && !selectedAnswer) {
@@ -302,6 +382,8 @@
             }, [lang, appState, qData]);
 
             const startPractice = (type) => {
+                setPracticeMode('module');
+                setDseQueue([]);
                 setModuleType(type);
                 setScore(0);
                 setQIndex(1);
@@ -309,10 +391,24 @@
                 generateQuestion(type);
             };
 
+            const startDsePractice = () => {
+                const queue = Array.from({ length: DSE_QUESTION_COUNT }, () => DSE_TYPE_POOL[Math.floor(Math.random() * DSE_TYPE_POOL.length)]);
+                setPracticeMode('dse');
+                setDseQueue(queue);
+                setScore(0);
+                setQIndex(1);
+                setModuleType(queue[0]);
+                setAppState('practice');
+                generateQuestion(queue[0]);
+            };
+
             const nextQuestion = () => {
-                if (qIndex < MAX_QUESTIONS) {
-                    setQIndex(prev => prev + 1);
-                    generateQuestion(moduleType);
+                if (qIndex < totalQuestions) {
+                    const nextIndex = qIndex + 1;
+                    const nextType = practiceMode === 'dse' ? dseQueue[nextIndex - 1] : moduleType;
+                    setQIndex(nextIndex);
+                    setModuleType(nextType);
+                    generateQuestion(nextType);
                 } else {
                     setAppState('summary');
                 }
@@ -321,6 +417,8 @@
             const goHome = () => {
                 setAppState('home');
                 setQData(null);
+                setPracticeMode('module');
+                setDseQueue([]);
             };
 
             const generateQuestion = (type) => {
@@ -330,6 +428,10 @@
                 else if (type === 4) generateType4Question();
                 else if (type === 5) generateType5Question();
                 else if (type === 6) generateType6Question();
+                else if (type === 7) generateType7Question();
+                else if (type === 8) generateType8Question();
+                else if (type === 9) generateType9Question();
+                else if (type === 10) generateType10Question();
             };
 
             const generateDistractors = (ans) => {
@@ -353,7 +455,7 @@
                 setUnlocked({});
                 setSelectedAnswer(null);
                 setEquipped(null);
-                setFeedback({ type: 'info', text: typeForHint === 6 ? t.hintStartType6 : t.hintStart });
+                setFeedback({ type: 'info', text: getHintStart(typeForHint) });
             };
 
             const generateType1Question = () => {
@@ -677,6 +779,181 @@
                 resetPracticeState(6);
             };
 
+            const generateType7Question = () => {
+                const x = Math.floor(Math.random() * 13) + 18;
+                const anglePTS = 3 * x;
+
+                const U = { x: 345, y: 265 };
+                const RU = 120;
+                const topAngle = 180 + x;
+                const topDir = getDir(topAngle);
+                const bottomDir = getDir(180);
+                const UP = 2 * RU * Math.cos(x * Math.PI / 180);
+                const UQ = RU * 0.8;
+                const US = UP * UQ / RU;
+
+                const P = { x: U.x + UP * topDir.x, y: U.y + UP * topDir.y };
+                const Q = { x: U.x + UQ * topDir.x, y: U.y + UQ * topDir.y };
+                const Rpt = { x: U.x + RU * bottomDir.x, y: U.y + RU * bottomDir.y };
+                const S = { x: U.x + US * bottomDir.x, y: U.y + US * bottomDir.y };
+                const T = getLineIntersection(P, Rpt, Q, S);
+                const circle = getCircleFrom3Points(P, Q, Rpt);
+
+                const P_label = getLabelOffsetFromCenter(P, circle, 24);
+                const Q_label = getLabelOffsetFromCenter(Q, circle, 24);
+                const R_label = getLabelOffsetFromCenter(Rpt, circle, 24);
+                const S_label = getLabelOffsetFromCenter(S, circle, 24);
+                const T_label = { ox: 0, oy: -18 };
+                const U_label = { ox: 22, oy: 4 };
+                const tickPR = getTickCoords(P, Rpt);
+                const tickRU = getTickCoords(Rpt, U);
+
+                const answer = x;
+                const givenAngles = ["PTS"];
+                const finalTargetId = "PUR";
+
+                const drawConfigs = [
+                    { id: 'PTS', val: anglePTS, v: T, p1: P, p2: S, r: 22, textR: 44, isReflex: false, arcs: 1, color: '#f43f5e' },
+                    { id: 'RTS', val: 180 - anglePTS, v: T, p1: Rpt, p2: S, r: 14, textR: 32, isReflex: false, arcs: 1, color: '#f97316' },
+                    { id: 'PUR', val: x, symbol: 'x', v: U, p1: P, p2: Rpt, r: 26, textR: 48, isReflex: false, arcs: 1, color: '#0ea5e9' },
+                    { id: 'UPR', val: x, symbol: 'x', v: P, p1: U, p2: Rpt, r: 30, textR: 54, isReflex: false, arcs: 1, color: '#06b6d4' },
+                    { id: 'PRU', val: 180 - 2 * x, symbol: '180°-2x', v: Rpt, p1: P, p2: U, r: 42, textR: 78, isReflex: false, arcs: 1, color: '#a855f7' },
+                    { id: 'PRS', val: 2 * x, symbol: '2x', v: Rpt, p1: P, p2: S, r: 18, textR: 40, isReflex: false, arcs: 2, color: '#eab308' },
+                    { id: 'QSR', val: x, symbol: 'x', v: S, p1: Q, p2: Rpt, r: 24, textR: 46, isReflex: false, arcs: 1, color: '#10b981' }
+                ];
+
+                setQData({ moduleType: 7, P, Q, R: Rpt, S, T, U, circleCenter: { x: circle.x, y: circle.y }, circleRadius: circle.r, answer, options: generateCloseDistractors(answer), drawConfigs, givenAngles, symbolicAngles: ['PUR'], finalTargetId, x, anglePTS, P_label, Q_label, R_label, S_label, T_label, U_label, tickPR, tickRU });
+                resetPracticeState(7);
+            };
+
+            const generateType8Question = () => {
+                const x = Math.floor(Math.random() * 9) + 34;
+                const angleBAC = 180 - 3 * x;
+                const angleBEC = angleBAC + x;
+                const angleBAD = angleBAC + x;
+
+                const angleA = 220;
+                const angleB = angleA - 2 * x;
+                const angleC = angleB - 2 * angleBAC;
+                const angleD = angleC - 2 * x;
+
+                const A = getPt(angleA);
+                const B = getPt(angleB);
+                const C = getPt(angleC);
+                const D = getPt(angleD);
+                const E = getLineIntersection(A, C, B, D);
+
+                const A_label = getLabelOffset(angleA);
+                const B_label = getLabelOffset(angleB);
+                const C_label = getLabelOffset(angleC);
+                const D_label = getLabelOffset(angleD);
+                const E_label = { ox: -22, oy: 0 };
+                const tickAB = getTickCoords(A, B);
+                const tickAD = getTickCoords(A, D);
+
+                const answer = angleBEC;
+                const givenAngles = ["BAC"];
+                const finalTargetId = "BEC";
+
+                const drawConfigs = [
+                    { id: 'BAC', val: angleBAC, v: A, p1: B, p2: C, r: 28, textR: 54, isReflex: false, arcs: 1, color: '#f43f5e' },
+                    { id: 'ACB', val: x, symbol: 'x', v: C, p1: A, p2: B, r: 24, textR: 46, isReflex: false, arcs: 1, color: '#0ea5e9' },
+                    { id: 'CAD', val: x, symbol: 'x', v: A, p1: C, p2: D, r: 46, textR: 74, isReflex: false, arcs: 1, color: '#06b6d4' },
+                    { id: 'ABD', val: x, symbol: 'x', v: B, p1: A, p2: D, r: 26, textR: 50, isReflex: false, arcs: 1, color: '#10b981' },
+                    { id: 'BDA', val: x, symbol: 'x', v: D, p1: B, p2: A, r: 24, textR: 46, isReflex: false, arcs: 1, color: '#84cc16' },
+                    { id: 'BAD', val: angleBAD, symbol: `${angleBAC}°+x`, v: A, p1: B, p2: D, r: 66, textR: 96, isReflex: false, arcs: 2, color: '#f97316' },
+                    { id: 'BEC', val: angleBEC, symbol: `${angleBAC}°+x`, v: E, p1: B, p2: C, r: 30, textR: 52, isReflex: false, arcs: 2, color: '#6366f1' }
+                ];
+
+                setQData({ moduleType: 8, A, B, C, D, E, answer, options: generateCloseDistractors(answer), drawConfigs, givenAngles, symbolicAngles: ['ACB'], finalTargetId, x, angleBAC, angleBEC, angleBAD, A_label, B_label, C_label, D_label, E_label, tickAB, tickAD });
+                resetPracticeState(8);
+            };
+
+            const generateType9Question = () => {
+                const theta = Math.floor(Math.random() * 15) + 23; // 23° to 37° keeps ∠COD clear and positive
+                const angleAOD = 2 * theta;
+                const angleBOC = 2 * theta;
+                const angleCOD = 180 - angleAOD - angleBOC;
+
+                const angleA = 90;
+                const angleB = 270;
+                const angleC = 270 + angleBOC;
+                const angleD = 90 - angleAOD;
+
+                const A = getPt(angleA);
+                const B = getPt(angleB);
+                const C = getPt(angleC);
+                const D = getPt(angleD);
+
+                const A_label = { ox: 22, oy: 2 };
+                const B_label = { ox: -22, oy: 2 };
+                const C_label = getLabelOffset(angleC, 24);
+                const D_label = getLabelOffset(angleD, 24);
+                const O_label = { ox: 0, oy: 24 };
+                const tickAC = getTickCoords(A, C);
+                const tickBD = getTickCoords(B, D);
+
+                const answer = angleCOD;
+                const givenAngles = ['ABD'];
+                const finalTargetId = 'COD';
+
+                const drawConfigs = [
+                    { id: 'ABD', val: theta, v: B, p1: A, p2: D, r: 28, textR: 54, isReflex: false, arcs: 1, color: '#f43f5e' },
+                    { id: 'AOD', val: angleAOD, v: O, p1: A, p2: D, r: 28, textR: 52, isReflex: false, arcs: 2, color: '#10b981' },
+                    { id: 'BOC', val: angleBOC, v: O, p1: B, p2: C, r: 28, textR: 52, isReflex: false, arcs: 2, color: '#8b5cf6' },
+                    { id: 'COD', val: angleCOD, v: O, p1: C, p2: D, r: 42, textR: 70, isReflex: false, arcs: 3, color: '#f97316' }
+                ];
+
+                setQData({ moduleType: 9, A, B, C, D, answer, options: generateCloseDistractors(answer), drawConfigs, givenAngles, finalTargetId, theta, angleAOD, angleBOC, angleCOD, A_label, B_label, C_label, D_label, O_label, tickAC, tickBD });
+                resetPracticeState(9);
+            };
+
+            const generateType10Question = () => {
+                const anglePTR = Math.floor(Math.random() * 11) + 58; // 58° to 68°, similar to the reference item
+                const anglePSR = anglePTR;
+                const anglePRS = 90;
+                const angleRPS = 90 - anglePTR;
+                const angleQPR = angleRPS;
+                const angleQPS = angleQPR + angleRPS;
+
+                const angleP = 270;
+                const angleS = 90;
+                const angleR = 2 * anglePTR - 90;
+                const angleQ = (4 * anglePTR - 270 + 360) % 360;
+                const angleT = 180 - angleR;
+
+                const P = getPt(angleP);
+                const Q = getPt(angleQ);
+                const Rpt = getPt(angleR);
+                const S = getPt(angleS);
+                const T = getPt(angleT);
+
+                const P_label = { ox: -22, oy: 3 };
+                const Q_label = getLabelOffset(angleQ, 24);
+                const R_label = getLabelOffset(angleR, 24);
+                const S_label = { ox: 22, oy: 3 };
+                const T_label = getLabelOffset(angleT, 24);
+                const tickQR = getTickCoords(Q, Rpt);
+                const tickRS = getTickCoords(Rpt, S);
+
+                const answer = angleQPS;
+                const givenAngles = ['PTR'];
+                const finalTargetId = 'QPS';
+
+                const drawConfigs = [
+                    { id: 'PTR', val: anglePTR, v: T, p1: P, p2: Rpt, r: 24, textR: 48, isReflex: false, arcs: 1, color: '#f43f5e' },
+                    { id: 'PSR', val: anglePSR, v: S, p1: P, p2: Rpt, r: 24, textR: 46, isReflex: false, arcs: 1, color: '#06b6d4' },
+                    { id: 'PRS', val: anglePRS, v: Rpt, p1: P, p2: S, r: 16, textR: 34, isReflex: false, arcs: 1, color: '#10b981', reqAuxPR: true },
+                    { id: 'RPS', val: angleRPS, v: P, p1: Rpt, p2: S, r: 28, textR: 54, isReflex: false, arcs: 1, color: '#8b5cf6', reqAuxPR: true },
+                    { id: 'QPR', val: angleQPR, v: P, p1: Q, p2: Rpt, r: 18, textR: 36, isReflex: false, arcs: 1, color: '#84cc16', reqAuxPR: true },
+                    { id: 'QPS', val: angleQPS, v: P, p1: Q, p2: S, r: 44, textR: 72, isReflex: false, arcs: 2, color: '#f97316' }
+                ];
+
+                setQData({ moduleType: 10, P, Q, R: Rpt, S, T, answer, options: generateCloseDistractors(answer), drawConfigs, givenAngles, finalTargetId, anglePTR, anglePSR, anglePRS, angleRPS, angleQPR, angleQPS, P_label, Q_label, R_label, S_label, T_label, tickQR, tickRS });
+                resetPracticeState(10);
+            };
+
+
             const getGivenText = () => {
                 if (!qData) return "";
                 if (qData.moduleType === 1) {
@@ -700,6 +977,14 @@
                     return `∠PQR = ${90 + qData.x}°`;
                 } else if (qData.moduleType === 6) {
                     return `∠ABD = ${qData.angleABD}° 及 ∠CAB = ${qData.angleCAB}°`;
+                } else if (qData.moduleType === 7) {
+                    return `∠PTS = ${qData.anglePTS}°`;
+                } else if (qData.moduleType === 8) {
+                    return `∠BAC = ${qData.angleBAC}°`;
+                } else if (qData.moduleType === 9) {
+                    return `∠ABD = ${qData.theta}°`;
+                } else if (qData.moduleType === 10) {
+                    return `∠PTR = ${qData.anglePTR}°`;
                 }
             };
 
@@ -714,6 +999,44 @@
                 if (qData && qData.symbolicAngles && qData.symbolicAngles.includes(id)) return true;
                 if (qData && qData.givenAngles.includes(id)) return true;
                 return false;
+            };
+
+            const formatAngleName = (id) => {
+                if (!id) return '';
+                if (id === 'solve_x') return lang === 'zh' ? 'x 的數值' : 'the value of x';
+                if (id.startsWith('aux_')) return lang === 'zh' ? '輔助線' : 'auxiliary line';
+                if (id.includes('reflex')) return `${t.reflex} ∠${id.replace('reflex', '')}`;
+                return `∠${id}`;
+            };
+
+            const formatAngleWithValue = (id, willSolveX = false) => {
+                const config = qData?.drawConfigs?.find(c => c.id === id);
+                if (!config) return formatAngleName(id);
+                const valueText = [6, 7, 8].includes(qData.moduleType) && config.symbol && !willSolveX ? config.symbol : `${config.val}°`;
+                return `${formatAngleName(id)} = ${valueText}`;
+            };
+
+            const getSuccessText = (theoremId, unlocks) => {
+                if (theoremId === 't_radii' || theoremId === 't_line') return t.hintAux;
+
+                const theoremName = t.theorems[theoremId] || theoremId;
+                const willSolveX = unlocked.solve_x || unlocks.includes('solve_x');
+                const angleUnlocks = unlocks.filter(id => id !== 'solve_x' && !id.startsWith('aux_'));
+                const details = angleUnlocks.map(id => formatAngleWithValue(id, willSolveX)).join(lang === 'zh' ? '、' : ', ');
+
+                if (unlocks.includes('solve_x')) {
+                    return lang === 'zh'
+                        ? `正確！你用了「${theoremName}」完成 x 的計算，已顯示 ${details}。`
+                        : `Correct! You used ${theoremName} to solve x. ${details} is now shown.`;
+                }
+
+                if (details) {
+                    return lang === 'zh'
+                        ? `正確！你用了「${theoremName}」，已標示 ${details}。`
+                        : `Correct! You used ${theoremName}. ${details} is now marked.`;
+                }
+
+                return t.hintValid;
             };
 
             const getActiveTargets = () => {
@@ -907,6 +1230,7 @@
                     }
                     if (equipped === 't_ext_tri') {
                         if (hasLogic('CAD') && hasLogic('AEC') && !hasLogic('ACB')) active.push('ACB');
+                        if (hasLogic('CAB') && hasLogic('ABC') && hasLogic('ACE') && !unlocked.solve_x) active.push('ACE');
                     }
                     if (equipped === 't_straight') {
                         if (hasLogic('ACE') && !hasLogic('ACB')) active.push('ACB');
@@ -914,6 +1238,75 @@
                     }
                     if (equipped === 't_adj') {
                         if (hasLogic('ABD') && hasLogic('CBD') && hasLogic('CAD') && hasLogic('AEC') && !hasLogic('ABC')) active.push('ABC');
+                    }
+                }
+                else if (qData.moduleType === 7) {
+                    if (equipped === 't_iso') {
+                        if (hasLogic('PUR') && !hasLogic('UPR')) active.push('UPR');
+                    }
+                    if (equipped === 't_segment') {
+                        if (hasLogic('UPR') && !hasLogic('QSR')) active.push('QSR');
+                    }
+                    if (equipped === 't_ext_tri') {
+                        if (hasLogic('PUR') && hasLogic('UPR') && !hasLogic('PRS')) active.push('PRS');
+                        if (hasLogic('PTS') && hasLogic('QSR') && hasLogic('PRS') && !unlocked.solve_x) active.push('PTS');
+                    }
+                    if (equipped === 't_straight') {
+                        if (hasLogic('PTS') && !hasLogic('RTS')) active.push('RTS');
+                        if (hasLogic('PRU') && !hasLogic('PRS')) active.push('PRS');
+                    }
+                    if (equipped === 't_tri_sum') {
+                        if (hasLogic('PUR') && hasLogic('UPR') && !hasLogic('PRU')) active.push('PRU');
+                        if (hasLogic('RTS') && hasLogic('QSR') && hasLogic('PRS') && !unlocked.solve_x) active.push('RTS');
+                    }
+                }
+                else if (qData.moduleType === 8) {
+                    if (equipped === 't_parallel') {
+                        if (hasLogic('ACB') && !hasLogic('CAD')) active.push('CAD');
+                    }
+                    if (equipped === 't_chord') {
+                        if (hasLogic('ACB') && !hasLogic('ABD')) active.push('ABD');
+                    }
+                    if (equipped === 't_iso') {
+                        if (hasLogic('ABD') && !hasLogic('BDA')) active.push('BDA');
+                    }
+                    if (equipped === 't_adj') {
+                        if (hasLogic('BAC') && hasLogic('CAD') && !hasLogic('BAD')) active.push('BAD');
+                    }
+                    if (equipped === 't_tri_sum') {
+                        if (hasLogic('BAD') && hasLogic('ABD') && hasLogic('BDA') && !unlocked.solve_x) active.push('ACB');
+                    }
+                    if (equipped === 't_ext_tri') {
+                        if (hasLogic('BAC') && hasLogic('ABD') && !hasLogic('BEC')) active.push('BEC');
+                    }
+                }
+                else if (qData.moduleType === 9) {
+                    if (equipped === 't_center') {
+                        if (hasLogic('ABD') && !hasLogic('AOD')) active.push('AOD');
+                    }
+                    if (equipped === 't_chord') {
+                        if (hasLogic('AOD') && !hasLogic('BOC')) active.push('BOC');
+                    }
+                    if (equipped === 't_straight' || equipped === 't_adj') {
+                        if (hasLogic('AOD') && hasLogic('BOC') && !hasLogic('COD')) active.push('COD');
+                    }
+                }
+                else if (qData.moduleType === 10) {
+                    if (equipped === 't_line' && !unlocked.aux_PR) active.push('aux_PR');
+                    if (equipped === 't_segment') {
+                        if (hasLogic('PTR') && !hasLogic('PSR')) active.push('PSR');
+                    }
+                    if (equipped === 't_semi' && unlocked.aux_PR) {
+                        if (!hasLogic('PRS')) active.push('PRS');
+                    }
+                    if (equipped === 't_tri_sum' && unlocked.aux_PR) {
+                        if (hasLogic('PSR') && hasLogic('PRS') && !hasLogic('RPS')) active.push('RPS');
+                    }
+                    if (equipped === 't_chord' && unlocked.aux_PR) {
+                        if (hasLogic('RPS') && !hasLogic('QPR')) active.push('QPR');
+                    }
+                    if (equipped === 't_adj') {
+                        if (hasLogic('QPR') && hasLogic('RPS') && !hasLogic('QPS')) active.push('QPS');
                     }
                 }
                 return active;
@@ -1081,11 +1474,78 @@
                         if (targetId === 'AEC' && hasLogic('CAD')) isValid = true;
                     } else if (theoremId === 't_ext_tri') {
                         if (targetId === 'ACB' && hasLogic('CAD') && hasLogic('AEC')) isValid = true;
+                        if (targetId === 'ACE' && hasLogic('CAB') && hasLogic('ABC') && hasLogic('ACE')) {
+                            isValid = true;
+                            unlocks = ['solve_x', 'CBD'];
+                        }
                     } else if (theoremId === 't_straight') {
                         if (targetId === 'ACB' && hasLogic('ACE')) isValid = true;
                         if (targetId === 'ACE' && hasLogic('ACB')) isValid = true;
                     } else if (theoremId === 't_adj') {
                         if (targetId === 'ABC' && hasLogic('ABD') && hasLogic('CBD') && hasLogic('CAD') && hasLogic('AEC')) isValid = true;
+                    }
+                }
+                else if (qData.moduleType === 7) {
+                    if (theoremId === 't_iso') {
+                        if (targetId === 'UPR' && hasLogic('PUR')) isValid = true;
+                    } else if (theoremId === 't_segment') {
+                        if (targetId === 'QSR' && hasLogic('UPR')) isValid = true;
+                    } else if (theoremId === 't_ext_tri') {
+                        if (targetId === 'PRS' && hasLogic('PUR') && hasLogic('UPR')) isValid = true;
+                        if (targetId === 'PTS' && hasLogic('PTS') && hasLogic('QSR') && hasLogic('PRS')) {
+                            isValid = true;
+                            unlocks = ['solve_x', 'PUR'];
+                        }
+                    } else if (theoremId === 't_straight') {
+                        if (targetId === 'RTS' && hasLogic('PTS')) isValid = true;
+                        if (targetId === 'PRS' && hasLogic('PRU')) isValid = true;
+                    } else if (theoremId === 't_tri_sum') {
+                        if (targetId === 'PRU' && hasLogic('PUR') && hasLogic('UPR')) isValid = true;
+                        if (targetId === 'RTS' && hasLogic('RTS') && hasLogic('QSR') && hasLogic('PRS')) {
+                            isValid = true;
+                            unlocks = ['solve_x', 'PUR'];
+                        }
+                    }
+                }
+                else if (qData.moduleType === 8) {
+                    if (theoremId === 't_parallel') {
+                        if (targetId === 'CAD' && hasLogic('ACB')) isValid = true;
+                    } else if (theoremId === 't_chord') {
+                        if (targetId === 'ABD' && hasLogic('ACB')) isValid = true;
+                    } else if (theoremId === 't_iso') {
+                        if (targetId === 'BDA' && hasLogic('ABD')) isValid = true;
+                    } else if (theoremId === 't_adj') {
+                        if (targetId === 'BAD' && hasLogic('BAC') && hasLogic('CAD')) isValid = true;
+                    } else if (theoremId === 't_tri_sum') {
+                        if (targetId === 'ACB' && hasLogic('BAD') && hasLogic('ABD') && hasLogic('BDA')) {
+                            isValid = true;
+                            unlocks = ['solve_x', 'ACB'];
+                        }
+                    } else if (theoremId === 't_ext_tri') {
+                        if (targetId === 'BEC' && hasLogic('BAC') && hasLogic('ABD')) isValid = true;
+                    }
+                }
+                else if (qData.moduleType === 9) {
+                    if (theoremId === 't_center') {
+                        if (targetId === 'AOD' && hasLogic('ABD')) isValid = true;
+                    } else if (theoremId === 't_chord') {
+                        if (targetId === 'BOC' && hasLogic('AOD')) isValid = true;
+                    } else if (theoremId === 't_straight' || theoremId === 't_adj') {
+                        if (targetId === 'COD' && hasLogic('AOD') && hasLogic('BOC')) isValid = true;
+                    }
+                }
+                else if (qData.moduleType === 10) {
+                    if (theoremId === 't_line' && targetId === 'aux_PR') isValid = true;
+                    else if (theoremId === 't_segment') {
+                        if (targetId === 'PSR' && hasLogic('PTR')) isValid = true;
+                    } else if (theoremId === 't_semi') {
+                        if (targetId === 'PRS' && unlocked.aux_PR) isValid = true;
+                    } else if (theoremId === 't_tri_sum') {
+                        if (targetId === 'RPS' && hasLogic('PSR') && hasLogic('PRS') && unlocked.aux_PR) isValid = true;
+                    } else if (theoremId === 't_chord') {
+                        if (targetId === 'QPR' && hasLogic('RPS') && unlocked.aux_PR) isValid = true;
+                    } else if (theoremId === 't_adj') {
+                        if (targetId === 'QPS' && hasLogic('QPR') && hasLogic('RPS')) isValid = true;
                     }
                 }
 
@@ -1094,9 +1554,7 @@
                     unlocks.forEach(u => newUnlocked[u] = true);
                     setUnlocked(newUnlocked);
 
-                    let successTxt = t.hintValid;
-                    if (theoremId === 't_radii' || theoremId === 't_line') successTxt = t.hintAux;
-                    setFeedback({ type: 'success', text: successTxt });
+                    setFeedback({ type: 'success', text: getSuccessText(theoremId, unlocks) });
                 } else {
                     setFeedback({ type: 'error', text: t.hintInvalid });
                 }
@@ -1109,74 +1567,88 @@
                 if (opt === qData.answer) {
                     setScore(s => s + 1);
                     setFeedback({ type: 'success', text: t.hintCorrect });
-                    setUnlocked(prev => ({...prev, [qData.finalTargetId]: true, ...(qData.moduleType === 6 ? { solve_x: true } : {})}));
+                    setUnlocked(prev => ({...prev, [qData.finalTargetId]: true, ...([6, 7, 8].includes(qData.moduleType) ? { solve_x: true } : {})}));
                 } else {
                     setFeedback({ type: 'error', text: t.hintWrong });
                 }
             };
 
             if (appState === 'home') {
+                const moduleCards = [
+                    { displayNo: 1, startType: 1, title: t.typeLabel1, name: t.homeType1, desc: t.homeType1Desc, accent: 'blue', accentBar: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700', hover: 'hover:border-blue-300', titleHover: 'group-hover:text-blue-700' },
+                    { displayNo: 2, startType: 2, title: t.typeLabel2, name: t.homeType2, desc: t.homeType2Desc, accent: 'purple', accentBar: 'bg-purple-500', badge: 'bg-purple-100 text-purple-700', hover: 'hover:border-purple-300', titleHover: 'group-hover:text-purple-700' },
+                    { displayNo: 3, startType: 3, title: t.typeLabel3, name: t.homeType3, desc: t.homeType3Desc, accent: 'emerald', accentBar: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700', hover: 'hover:border-emerald-300', titleHover: 'group-hover:text-emerald-700' },
+                    { displayNo: 4, startType: 4, title: t.typeLabel4, name: t.homeType4, desc: t.homeType4Desc, accent: 'rose', accentBar: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700', hover: 'hover:border-rose-300', titleHover: 'group-hover:text-rose-700' },
+                    { displayNo: 5, startType: 5, title: t.typeLabel5, name: t.homeType5, desc: t.homeType5Desc, accent: 'amber', accentBar: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700', hover: 'hover:border-amber-300', titleHover: 'group-hover:text-amber-700' },
+                    { displayNo: 6, startType: 6, title: t.typeLabel6, name: t.homeType6, desc: t.homeType6Desc, accent: 'teal', accentBar: 'bg-teal-500', badge: 'bg-teal-100 text-teal-700', hover: 'hover:border-teal-300', titleHover: 'group-hover:text-teal-700' },
+                    { displayNo: 7, startType: 7, title: t.typeLabel7, name: t.homeType7, desc: t.homeType7Desc, accent: 'cyan', accentBar: 'bg-cyan-500', badge: 'bg-cyan-100 text-cyan-700', hover: 'hover:border-cyan-300', titleHover: 'group-hover:text-cyan-700' },
+                    { displayNo: 8, startType: 8, title: t.typeLabel8, name: t.homeType8, desc: t.homeType8Desc, accent: 'indigo', accentBar: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-700', hover: 'hover:border-indigo-300', titleHover: 'group-hover:text-indigo-700' },
+                    { displayNo: 9, startType: 10, title: t.typeLabel9, name: t.homeType9, desc: t.homeType9Desc, accent: 'lime', accentBar: 'bg-lime-500', badge: 'bg-lime-100 text-lime-700', hover: 'hover:border-lime-300', titleHover: 'group-hover:text-lime-700' }
+                ];
+
                 return (
-                    <div className="min-h-screen flex flex-col items-center bg-slate-50 p-6 font-sans">
-                        <div className="w-full max-w-6xl flex justify-end mb-8">
-                            <button onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')} className="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition-colors shadow-sm">
-                                <GlobeIcon /> {lang === 'zh' ? 'EN' : '中文'}
-                            </button>
-                        </div>
+                    <div className="min-h-screen bg-slate-50 p-4 md:p-6 font-sans">
+                        <div className="w-full max-w-6xl mx-auto">
+                            <div className="flex justify-end mb-5">
+                                <button onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')} className="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                                    <GlobeIcon /> {lang === 'zh' ? 'EN' : '中文'}
+                                </button>
+                            </div>
 
-                        <div className="text-center mb-10">
-                            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2">{t.appTitle}</h1>
-                            <p className="text-slate-500 text-lg">{t.homeSelect}</p>
-                        </div>
+                            <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-6 md:p-8 mb-6">
+                                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                                    <div>
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-bold mb-4">Circle Geometry Explorer</div>
+                                        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-800 mb-3">{t.appTitle}</h1>
+                                        <p className="text-slate-600 text-base md:text-lg max-w-3xl">{t.homeSelect}</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3 min-w-[220px]">
+                                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
+                                            <div className="text-2xl font-black text-slate-800">9</div>
+                                            <div className="text-sm text-slate-500">{lang === 'zh' ? '題型' : 'Modules'}</div>
+                                        </div>
+                                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
+                                            <div className="text-2xl font-black text-slate-800">20</div>
+                                            <div className="text-sm text-slate-500">{lang === 'zh' ? 'DSE 題目' : 'DSE Qs'}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
-                            <button onClick={() => startPractice(1)} className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-300 transition-all border-2 border-transparent text-left flex items-start gap-4 group relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
-                                <div className="w-12 h-12 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center text-xl font-bold shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">1</div>
-                                <div>
-                                    <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-700 transition-colors">{t.typeLabel1}</h2>
+                            <button onClick={startDsePractice} className="w-full text-left bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white rounded-3xl shadow-lg p-6 md:p-8 mb-8 hover:shadow-xl transition-all">
+                                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                                    <div>
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-sm font-semibold mb-4">{t.practiceCount20}</div>
+                                        <h2 className="text-2xl md:text-3xl font-black mb-2">{t.dseModeTitle}</h2>
+                                        <p className="text-blue-50 text-base md:text-lg max-w-3xl">{t.dseModeDesc}</p>
+                                    </div>
+                                    <div className="self-start lg:self-center px-5 py-3 bg-white text-blue-700 rounded-2xl font-bold shadow-md">{t.dseModeCta}</div>
                                 </div>
                             </button>
 
-                            <button onClick={() => startPractice(2)} className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-purple-300 transition-all border-2 border-transparent text-left flex items-start gap-4 group relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-purple-500"></div>
-                                <div className="w-12 h-12 bg-purple-100 text-purple-700 rounded-xl flex items-center justify-center text-xl font-bold shrink-0 group-hover:bg-purple-600 group-hover:text-white transition-colors">2</div>
-                                <div>
-                                    <h2 className="text-xl font-bold text-slate-800 group-hover:text-purple-700 transition-colors">{t.typeLabel2}</h2>
-                                </div>
-                            </button>
+                            <div className="mb-4">
+                                <h2 className="text-2xl font-bold text-slate-800">{t.moduleSectionTitle}</h2>
+                                <p className="text-slate-500 mt-1">{t.moduleSectionDesc}</p>
+                            </div>
 
-                            <button onClick={() => startPractice(3)} className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-300 transition-all border-2 border-transparent text-left flex items-start gap-4 group relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
-                                <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center text-xl font-bold shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">3</div>
-                                <div>
-                                    <h2 className="text-xl font-bold text-slate-800 group-hover:text-emerald-700 transition-colors">{t.typeLabel3}</h2>
-                                </div>
-                            </button>
-
-                            <button onClick={() => startPractice(4)} className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-rose-300 transition-all border-2 border-transparent text-left flex items-start gap-4 group relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-rose-500"></div>
-                                <div className="w-12 h-12 bg-rose-100 text-rose-700 rounded-xl flex items-center justify-center text-xl font-bold shrink-0 group-hover:bg-rose-600 group-hover:text-white transition-colors">4</div>
-                                <div>
-                                    <h2 className="text-xl font-bold text-slate-800 group-hover:text-rose-700 transition-colors">{t.typeLabel4}</h2>
-                                </div>
-                            </button>
-
-                            <button onClick={() => startPractice(5)} className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-300 transition-all border-2 border-transparent text-left flex items-start gap-4 group relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
-                                <div className="w-12 h-12 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center text-xl font-bold shrink-0 group-hover:bg-amber-600 group-hover:text-white transition-colors">5</div>
-                                <div>
-                                    <h2 className="text-xl font-bold text-slate-800 group-hover:text-amber-700 transition-colors">{t.typeLabel5}</h2>
-                                </div>
-                            </button>
-
-                            <button onClick={() => startPractice(6)} className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-300 transition-all border-2 border-transparent text-left flex items-start gap-4 group relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-teal-500"></div>
-                                <div className="w-12 h-12 bg-teal-100 text-teal-700 rounded-xl flex items-center justify-center text-xl font-bold shrink-0 group-hover:bg-teal-600 group-hover:text-white transition-colors">6</div>
-                                <div>
-                                    <h2 className="text-xl font-bold text-slate-800 group-hover:text-teal-700 transition-colors">{t.typeLabel6}</h2>
-                                </div>
-                            </button>
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full">
+                                {moduleCards.map(card => (
+                                    <button key={card.displayNo} onClick={() => startPractice(card.startType)} className={`bg-white p-6 rounded-2xl shadow-sm ${card.hover} transition-all border-2 border-transparent text-left group relative overflow-hidden hover:-translate-y-0.5`}>
+                                        <div className={`absolute top-0 left-0 w-1.5 h-full ${card.accentBar}`}></div>
+                                        <div className="flex items-start gap-4">
+                                            <div className={`w-12 h-12 ${card.badge} rounded-xl flex items-center justify-center text-xl font-bold shrink-0`}>{card.displayNo}</div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between gap-3 mb-2">
+                                                    <h3 className={`text-lg md:text-xl font-bold text-slate-800 transition-colors ${card.titleHover}`}>{card.title}</h3>
+                                                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 shrink-0">{t.practiceCount5}</span>
+                                                </div>
+                                                <p className="text-slate-700 font-semibold mb-2">{card.name}</p>
+                                                <p className="text-sm leading-6 text-slate-500">{card.desc}</p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 );
@@ -1189,7 +1661,7 @@
                             <div className="flex justify-center mb-6"><TrophyIcon /></div>
                             <h1 className="text-3xl font-extrabold text-slate-800 mb-2">{t.summaryTitle}</h1>
                             <p className="text-slate-500 mb-8">{t.summaryScore}</p>
-                            <div className="text-6xl font-black text-blue-600 mb-10">{score} <span className="text-3xl text-slate-300">/ {MAX_QUESTIONS}</span></div>
+                            <div className="text-6xl font-black text-blue-600 mb-10">{score} <span className="text-3xl text-slate-300">/ {totalQuestions}</span></div>
                             <button onClick={goHome} className="w-full py-4 bg-slate-800 hover:bg-blue-600 text-white text-lg font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
                                 <HomeIcon /> {t.backHome}
                             </button>
@@ -1206,21 +1678,31 @@
             if (qData.moduleType === 4) baseText = t.baseTextType4;
             if (qData.moduleType === 5) baseText = t.baseTextType5;
             if (qData.moduleType === 6) baseText = t.baseTextType6;
+            if (qData.moduleType === 7) baseText = t.baseTextType7;
+            if (qData.moduleType === 8) baseText = t.baseTextType8;
+            if (qData.moduleType === 9) baseText = t.baseTextType9;
+            if (qData.moduleType === 10) baseText = t.baseTextType9;
 
             const moduleTitle = qData.moduleType === 1 ? t.homeType1 :
                 qData.moduleType === 2 ? t.homeType2 :
                 qData.moduleType === 3 ? t.homeType3 :
                 qData.moduleType === 4 ? t.homeType4 :
-                qData.moduleType === 5 ? t.homeType5 : t.homeType6;
+                qData.moduleType === 5 ? t.homeType5 :
+                qData.moduleType === 6 ? t.homeType6 :
+                qData.moduleType === 7 ? t.homeType7 :
+                qData.moduleType === 8 ? t.homeType8 : t.homeType9;
 
             return (
                 <div className="min-h-screen flex flex-col p-2 md:p-6 font-sans text-slate-800 animate-in fade-in duration-300">
 
                     <div className="w-full max-w-6xl mx-auto flex justify-between items-center mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                         <div>
-                            <h1 className="text-xl md:text-2xl font-bold text-slate-800">
-                                {moduleTitle}
-                            </h1>
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <h1 className="text-xl md:text-2xl font-bold text-slate-800">
+                                    {moduleTitle}
+                                </h1>
+                                {practiceMode === 'dse' && <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs md:text-sm font-bold">{t.dseModeTitle}</span>}
+                            </div>
                         </div>
                         <div className="flex items-center gap-6">
                             <button onClick={goHome} className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors">
@@ -1228,7 +1710,7 @@
                             </button>
                             <div className="text-right border-l border-slate-200 pl-6">
                                 <div className="text-xs font-semibold text-slate-500 uppercase">{t.progress}</div>
-                                <div className="text-xl md:text-2xl font-bold text-blue-600 leading-none">{qIndex} <span className="text-slate-400 text-sm md:text-lg">/ {MAX_QUESTIONS}</span></div>
+                                <div className="text-xl md:text-2xl font-bold text-blue-600 leading-none">{qIndex} <span className="text-slate-400 text-sm md:text-lg">/ {totalQuestions}</span></div>
                             </div>
                         </div>
                     </div>
@@ -1249,6 +1731,10 @@
                             if (qData.moduleType === 4 && !['t_line', 't_cyclic', 't_semi', 't_segment', 't_adj'].includes(key)) return null;
                             if (qData.moduleType === 5 && !['t_line', 't_semi', 't_segment', 't_adj', 't_cyclic', 't_tri_sum'].includes(key)) return null;
                             if (qData.moduleType === 6 && !['t_segment', 't_iso', 't_tri_sum', 't_ext_tri', 't_straight', 't_adj'].includes(key)) return null;
+                            if (qData.moduleType === 7 && !['t_iso', 't_segment', 't_ext_tri', 't_straight', 't_tri_sum'].includes(key)) return null;
+                            if (qData.moduleType === 8 && !['t_parallel', 't_chord', 't_iso', 't_adj', 't_tri_sum', 't_ext_tri'].includes(key)) return null;
+                            if (qData.moduleType === 9 && !['t_center', 't_chord', 't_straight', 't_adj'].includes(key)) return null;
+                            if (qData.moduleType === 10 && !['t_line', 't_segment', 't_semi', 't_tri_sum', 't_chord', 't_adj'].includes(key)) return null;
 
                             return (
                                 <div
@@ -1269,10 +1755,12 @@
 
                     <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row bg-white border border-t-0 border-slate-200 rounded-b-xl shadow-sm overflow-hidden">
 
-                        <div className="flex-1 p-6 flex justify-center items-center relative border-b md:border-b-0 md:border-r border-slate-100 min-h-[450px]">
-                            <svg viewBox="0 0 400 400" className="w-full max-w-[400px] h-auto select-none">
-                                {qData.moduleType === 6 ? (
+                        <div className="flex-1 p-6 flex justify-center items-center relative border-b md:border-b-0 md:border-r border-slate-100 min-h-[450px]" style={qData.moduleType === 7 ? { flex: '1.35 1 0%', minHeight: 560, padding: 12 } : undefined}>
+                            <svg viewBox="0 0 400 400" className="w-full h-auto select-none" style={{ maxWidth: qData.moduleType === 7 ? 560 : (qData.moduleType === 6 ? 470 : 400) }}>
+                                {qData.moduleType === 6 || qData.moduleType === 7 ? (
                                     <circle cx={qData.circleCenter.x} cy={qData.circleCenter.y} r={qData.circleRadius} fill="none" stroke="#cbd5e1" strokeWidth="2.5" />
+                                ) : qData.moduleType === 9 ? (
+                                    <path d={`M ${qData.B.x} ${qData.B.y} A ${R} ${R} 0 0 1 ${qData.A.x} ${qData.A.y}`} fill="none" stroke="#cbd5e1" strokeWidth="2.5" />
                                 ) : (
                                     <circle cx={O.x} cy={O.y} r={R} fill="none" stroke="#cbd5e1" strokeWidth="2.5" />
                                 )}
@@ -1328,7 +1816,7 @@
                                         <line x1={qData.S.x} y1={qData.S.y} x2={qData.T.x} y2={qData.T.y} stroke="#0f172a" strokeWidth="2" />
                                         {unlocked.aux_QS && <line x1={qData.Q.x} y1={qData.Q.y} x2={qData.S.x} y2={qData.S.y} stroke="#94a3b8" strokeWidth="2" strokeDasharray="4 4" />}
                                     </g>
-                                ) : (
+                                ) : qData.moduleType === 6 ? (
                                     <g>
                                         <line x1={qData.E.x} y1={qData.E.y} x2={qData.A.x} y2={qData.A.y} stroke="#0f172a" strokeWidth="2" />
                                         <line x1={qData.E.x} y1={qData.E.y} x2={qData.B.x} y2={qData.B.y} stroke="#0f172a" strokeWidth="2" />
@@ -1338,6 +1826,55 @@
                                         <g stroke="#0f172a" strokeWidth="2">
                                             <line x1={qData.tickAC.x1} y1={qData.tickAC.y1} x2={qData.tickAC.x2} y2={qData.tickAC.y2} />
                                             <line x1={qData.tickCE.x1} y1={qData.tickCE.y1} x2={qData.tickCE.x2} y2={qData.tickCE.y2} />
+                                        </g>
+                                    </g>
+                                ) : qData.moduleType === 7 ? (
+                                    <g>
+                                        <line x1={qData.U.x} y1={qData.U.y} x2={qData.P.x} y2={qData.P.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.U.x} y1={qData.U.y} x2={qData.S.x} y2={qData.S.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.P.x} y1={qData.P.y} x2={qData.R.x} y2={qData.R.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.Q.x} y1={qData.Q.y} x2={qData.S.x} y2={qData.S.y} stroke="#0f172a" strokeWidth="2" />
+                                        <g stroke="#0f172a" strokeWidth="2">
+                                            <line x1={qData.tickPR.x1} y1={qData.tickPR.y1} x2={qData.tickPR.x2} y2={qData.tickPR.y2} />
+                                            <line x1={qData.tickRU.x1} y1={qData.tickRU.y1} x2={qData.tickRU.x2} y2={qData.tickRU.y2} />
+                                        </g>
+                                    </g>
+                                ) : qData.moduleType === 8 ? (
+                                    <g>
+                                        <line x1={qData.A.x} y1={qData.A.y} x2={qData.B.x} y2={qData.B.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.A.x} y1={qData.A.y} x2={qData.D.x} y2={qData.D.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.B.x} y1={qData.B.y} x2={qData.C.x} y2={qData.C.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.A.x} y1={qData.A.y} x2={qData.C.x} y2={qData.C.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.B.x} y1={qData.B.y} x2={qData.D.x} y2={qData.D.y} stroke="#0f172a" strokeWidth="2" />
+                                        <g stroke="#0f172a" strokeWidth="2">
+                                            <line x1={qData.tickAB.x1} y1={qData.tickAB.y1} x2={qData.tickAB.x2} y2={qData.tickAB.y2} />
+                                            <line x1={qData.tickAD.x1} y1={qData.tickAD.y1} x2={qData.tickAD.x2} y2={qData.tickAD.y2} />
+                                        </g>
+                                    </g>
+                                ) : qData.moduleType === 9 ? (
+                                    <g>
+                                        <line x1={qData.B.x} y1={qData.B.y} x2={qData.A.x} y2={qData.A.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.A.x} y1={qData.A.y} x2={qData.C.x} y2={qData.C.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.B.x} y1={qData.B.y} x2={qData.D.x} y2={qData.D.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={O.x} y1={O.y} x2={qData.C.x} y2={qData.C.y} stroke="#64748b" strokeWidth="1.8" />
+                                        <line x1={O.x} y1={O.y} x2={qData.D.x} y2={qData.D.y} stroke="#64748b" strokeWidth="1.8" />
+                                        <g stroke="#0f172a" strokeWidth="2">
+                                            <line x1={qData.tickAC.x1} y1={qData.tickAC.y1} x2={qData.tickAC.x2} y2={qData.tickAC.y2} />
+                                            <line x1={qData.tickBD.x1} y1={qData.tickBD.y1} x2={qData.tickBD.x2} y2={qData.tickBD.y2} />
+                                        </g>
+                                    </g>
+                                ) : (
+                                    <g>
+                                        <line x1={qData.P.x} y1={qData.P.y} x2={qData.S.x} y2={qData.S.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.P.x} y1={qData.P.y} x2={qData.Q.x} y2={qData.Q.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.Q.x} y1={qData.Q.y} x2={qData.R.x} y2={qData.R.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.R.x} y1={qData.R.y} x2={qData.S.x} y2={qData.S.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.P.x} y1={qData.P.y} x2={qData.T.x} y2={qData.T.y} stroke="#0f172a" strokeWidth="2" />
+                                        <line x1={qData.R.x} y1={qData.R.y} x2={qData.T.x} y2={qData.T.y} stroke="#0f172a" strokeWidth="2" />
+                                        {unlocked.aux_PR && <line x1={qData.P.x} y1={qData.P.y} x2={qData.R.x} y2={qData.R.y} stroke="#94a3b8" strokeWidth="2" strokeDasharray="4 4" />}
+                                        <g stroke="#0f172a" strokeWidth="2">
+                                            <line x1={qData.tickQR.x1} y1={qData.tickQR.y1} x2={qData.tickQR.x2} y2={qData.tickQR.y2} />
+                                            <line x1={qData.tickRS.x1} y1={qData.tickRS.y1} x2={qData.tickRS.x2} y2={qData.tickRS.y2} />
                                         </g>
                                     </g>
                                 )}
@@ -1367,6 +1904,11 @@
                                         onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); attemptUnlock('aux_QS', e.dataTransfer.getData('theorem')); }}
                                         onClick={() => attemptUnlock('aux_QS', equipped)} className="cursor-pointer transition-all animate-pulse" />
                                 )}
+                                {activeTargets.includes('aux_PR') && (
+                                    <circle cx={(qData.P.x + qData.R.x)/2} cy={(qData.P.y + qData.R.y)/2} r={24} fill="rgba(239, 68, 68, 0.15)" stroke="#ef4444" strokeDasharray="4" strokeWidth="2"
+                                        onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); attemptUnlock('aux_PR', e.dataTransfer.getData('theorem')); }}
+                                        onClick={() => attemptUnlock('aux_PR', equipped)} className="cursor-pointer transition-all animate-pulse" />
+                                )}
 
                                 {qData.drawConfigs.map(config => {
                                     if (qData.moduleType === 3) {
@@ -1376,6 +1918,8 @@
                                         if (config.reqAuxAE && !unlocked.aux_AE) return null;
                                     } else if (qData.moduleType === 5) {
                                         if (config.reqAuxQS && !unlocked.aux_QS) return null;
+                                    } else if (qData.moduleType === 10) {
+                                        if (config.reqAuxPR && !unlocked.aux_PR) return null;
                                     } else {
                                         if (config.reqAux) {
                                             if (moduleType === 1 && !unlocked.aux_OB) return null;
@@ -1395,7 +1939,7 @@
                                     const arcPath = drawAngleArc(config.v, config.p1, config.p2, config.r, config.isReflex, config.arcs);
                                     const textPos = getAnglePos(config.v, config.p1, config.p2, config.textR, config.isReflex);
                                     const hitPos = getAnglePos(config.v, config.p1, config.p2, config.r, config.isReflex);
-                                    const labelText = qData.moduleType === 6 && config.symbol && !unlocked.solve_x ? config.symbol : `${config.val}°`;
+                                    const labelText = [6, 7, 8].includes(qData.moduleType) && config.symbol && !unlocked.solve_x ? config.symbol : `${config.val}°`;
                                     const isKnownOrSymbolic = isUnlocked || isSymbolicGiven;
 
                                     return (
@@ -1433,6 +1977,39 @@
                                             {p: qData.C, l: 'C', labelData: qData.C_label},
                                             {p: qData.D, l: 'D', labelData: qData.D_label},
                                             {p: qData.E, l: 'E', labelData: qData.E_label}
+                                        ];
+                                    } else if (qData.moduleType === 7) {
+                                        pts = [
+                                            {p: qData.P, l: 'P', labelData: qData.P_label},
+                                            {p: qData.Q, l: 'Q', labelData: qData.Q_label},
+                                            {p: qData.R, l: 'R', labelData: qData.R_label},
+                                            {p: qData.S, l: 'S', labelData: qData.S_label},
+                                            {p: qData.T, l: 'T', labelData: qData.T_label},
+                                            {p: qData.U, l: 'U', labelData: qData.U_label}
+                                        ];
+                                    } else if (qData.moduleType === 8) {
+                                        pts = [
+                                            {p: qData.A, l: 'A', labelData: qData.A_label},
+                                            {p: qData.B, l: 'B', labelData: qData.B_label},
+                                            {p: qData.C, l: 'C', labelData: qData.C_label},
+                                            {p: qData.D, l: 'D', labelData: qData.D_label},
+                                            {p: qData.E, l: 'E', labelData: qData.E_label}
+                                        ];
+                                    } else if (qData.moduleType === 9) {
+                                        pts = [
+                                            {p: qData.A, l: 'A', labelData: qData.A_label},
+                                            {p: qData.B, l: 'B', labelData: qData.B_label},
+                                            {p: qData.C, l: 'C', labelData: qData.C_label},
+                                            {p: qData.D, l: 'D', labelData: qData.D_label},
+                                            {p: O, l: 'O', labelData: qData.O_label}
+                                        ];
+                                    } else if (qData.moduleType === 10) {
+                                        pts = [
+                                            {p: qData.P, l: 'P', labelData: qData.P_label},
+                                            {p: qData.Q, l: 'Q', labelData: qData.Q_label},
+                                            {p: qData.R, l: 'R', labelData: qData.R_label},
+                                            {p: qData.S, l: 'S', labelData: qData.S_label},
+                                            {p: qData.T, l: 'T', labelData: qData.T_label}
                                         ];
                                     } else {
                                         pts = [
@@ -1501,7 +2078,7 @@
 
                             {selectedAnswer !== null && (
                                 <button onClick={nextQuestion} className="mt-6 w-full py-4 bg-slate-800 hover:bg-blue-600 text-white text-lg font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
-                                    {qIndex < MAX_QUESTIONS ? t.nextBtn : t.finishBtn} <ArrowRightIcon />
+                                    {qIndex < totalQuestions ? t.nextBtn : t.finishBtn} <ArrowRightIcon />
                                 </button>
                             )}
                         </div>

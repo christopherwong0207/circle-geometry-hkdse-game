@@ -14,7 +14,8 @@
     <style>
         html, body {
             min-height: 100%;
-            overscroll-behavior: none;
+            overscroll-behavior-y: auto;
+            overscroll-behavior-x: none;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -71,9 +72,8 @@
 
         @media (min-width: 768px) and (pointer: coarse) {
             .ipad-practice-shell {
-                height: 100dvh;
                 min-height: 100dvh;
-                overflow: hidden;
+                overflow-x: hidden;
                 padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
             }
 
@@ -97,7 +97,7 @@
             .ipad-main-panel {
                 flex: 1 1 auto;
                 min-height: 0;
-                overflow: hidden;
+                overflow: visible;
             }
 
             .ipad-diagram-pane {
@@ -109,9 +109,9 @@
                 width: 372px;
                 max-width: 372px;
                 min-height: 0;
-                overflow-y: auto;
+                overflow-y: visible;
                 -webkit-overflow-scrolling: touch;
-                padding-bottom: calc(96px + env(safe-area-inset-bottom));
+                padding-bottom: calc(24px + env(safe-area-inset-bottom));
             }
         }
 
@@ -123,30 +123,25 @@
         .compact-toolbox { flex-shrink: 0; }
 
         @media (min-width: 768px) and (pointer: coarse) {
-            html, body, #root {
-                height: 100%;
-                overflow: hidden;
-            }
-
             .compact-topbar {
                 margin-bottom: 0.35rem !important;
-                padding: 0.45rem 0.75rem !important;
+                padding: 0.35rem 0.65rem !important;
                 border-radius: 0.85rem !important;
             }
 
             .compact-topbar h1 {
-                font-size: 1rem !important;
-                line-height: 1.15 !important;
+                font-size: 0.95rem !important;
+                line-height: 1.08 !important;
             }
 
             .compact-question-card {
                 min-height: 0 !important;
-                padding: 0.55rem 0.75rem !important;
+                padding: 0.45rem 0.65rem !important;
             }
 
             .compact-question-card p {
                 font-size: 1rem !important;
-                line-height: 1.35 !important;
+                line-height: 1.28 !important;
             }
 
             .dse-question-strip {
@@ -194,25 +189,25 @@
             }
 
             .ipad-diagram-pane {
-                flex: 0 0 42% !important;
-                max-width: 42% !important;
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
                 min-height: 0 !important;
                 padding: 0.55rem !important;
             }
 
             .ipad-diagram-pane svg {
-                max-width: 330px !important;
-                max-height: calc(100dvh - 190px) !important;
+                max-width: 390px !important;
+                max-height: calc(100dvh - 155px) !important;
             }
 
             .ipad-side-pane {
                 width: auto !important;
                 max-width: none !important;
-                flex: 1 1 58% !important;
-                padding: 0.75rem !important;
-                overflow-y: auto;
-                overscroll-behavior: contain;
-                padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)) !important;
+                flex: 1 1 50% !important;
+                padding: 0.65rem !important;
+                overflow-y: visible;
+                overscroll-behavior-y: auto;
+                padding-bottom: calc(0.65rem + env(safe-area-inset-bottom)) !important;
             }
 
             .stable-feedback-card {
@@ -566,7 +561,7 @@ const i18n = {
         summaryTitle: '練習完成！',
         summaryScore: '你的最終得分',
         dseModeTitle: 'DSE 練習模式',
-        dseModeDesc: '一共 20 題，系統會隨機由題型一至題型七抽題，適合做綜合操練。',
+        dseModeDesc: '一共 20 題，系統會隨機從題型 1 至題型 9 抽題，適合做綜合操練。',
         dseModeCta: '開始 20 題綜合練習',
         moduleSectionTitle: '分題型練習',
         moduleSectionDesc: '每個題型各有 5 題隨機題，方便逐項訓練。',
@@ -676,7 +671,7 @@ const i18n = {
         summaryTitle: 'Practice Completed!',
         summaryScore: 'Your Final Score',
         dseModeTitle: 'DSE Practice Mode',
-        dseModeDesc: '20 questions in total. Each question is randomly drawn from visible Type 1 to Type 7 modules for mixed practice.',
+        dseModeDesc: '20 questions in total. Each question is randomly drawn from Type 1 to Type 9 for mixed practice.',
         dseModeCta: 'Start 20-question mixed practice',
         moduleSectionTitle: 'Practice by Module',
         moduleSectionDesc: 'Each module contains 5 randomized questions for focused training.',
@@ -2933,7 +2928,7 @@ const getGivenText = () => {
         ];
         return (React.createElement("div", { className: "min-h-screen bg-slate-50 p-4 md:p-6 font-sans" },
             React.createElement("div", { className: "w-full max-w-6xl mx-auto" },
-                React.createElement("div", { className: "flex justify-end gap-2 mb-5" },
+                React.createElement("div", { className: "flex justify-end gap-2 mb-3" },
                     React.createElement("button", { onClick: toggleFullscreen, className: "flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition-colors shadow-sm" },
                         React.createElement(FullscreenIcon, null),
                         " ",
@@ -2942,39 +2937,31 @@ const getGivenText = () => {
                         React.createElement(GlobeIcon, null),
                         " ",
                         lang === 'zh' ? 'EN' : '中文')),
-                React.createElement("div", { className: "bg-white border border-slate-200 rounded-3xl shadow-sm p-6 md:p-8 mb-6" },
-                    React.createElement("div", { className: "flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6" },
+                React.createElement("div", { className: "bg-white border border-slate-200 rounded-2xl shadow-sm px-4 py-3 md:px-5 md:py-4 mb-4" },
+                    React.createElement("div", { className: "flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3" },
                         React.createElement("div", null,
-                            React.createElement("div", { className: "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-bold mb-4" }, "Circle Geometry Explorer"),
-                            React.createElement("h1", { className: "text-3xl md:text-4xl font-extrabold text-slate-800 mb-3" }, t.appTitle),
-                            React.createElement("p", { className: "text-slate-600 text-base md:text-lg max-w-3xl" }, t.homeSelect)),
-                        React.createElement("div", { className: "grid grid-cols-2 gap-3 min-w-[220px]" },
-                            React.createElement("div", { className: "bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center" },
-                                React.createElement("div", { className: "text-2xl font-black text-slate-800" }, "9"),
-                                React.createElement("div", { className: "text-sm text-slate-500" }, lang === 'zh' ? '題型' : 'Modules')),
-                            React.createElement("div", { className: "bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center" },
-                                React.createElement("div", { className: "text-2xl font-black text-slate-800" }, "20"),
-                                React.createElement("div", { className: "text-sm text-slate-500" }, lang === 'zh' ? 'DSE 題目' : 'DSE Qs'))))),
-                React.createElement("button", { onClick: startDsePractice, className: "w-full text-left bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white rounded-3xl shadow-lg p-6 md:p-8 mb-8 hover:shadow-xl transition-all" },
-                    React.createElement("div", { className: "flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6" },
+                            React.createElement("div", { className: "inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold mb-2" }, "Circle Geometry Explorer"),
+                            React.createElement("h1", { className: "text-2xl md:text-3xl font-extrabold text-slate-800 mb-1 leading-tight" }, t.appTitle),
+                            React.createElement("p", { className: "text-slate-600 text-sm md:text-base max-w-3xl leading-snug" }, t.homeSelect)))) ,
+                React.createElement("button", { onClick: startDsePractice, className: "w-full text-left bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white rounded-2xl shadow-md px-4 py-4 md:px-5 md:py-4 mb-5 hover:shadow-lg transition-all" },
+                    React.createElement("div", { className: "flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4" },
                         React.createElement("div", null,
-                            React.createElement("div", { className: "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-sm font-semibold mb-4" }, t.practiceCount20),
-                            React.createElement("h2", { className: "text-2xl md:text-3xl font-black mb-2" }, t.dseModeTitle),
-                            React.createElement("p", { className: "text-blue-50 text-base md:text-lg max-w-3xl" }, t.dseModeDesc)),
-                        React.createElement("div", { className: "self-start lg:self-center px-5 py-3 bg-white text-blue-700 rounded-2xl font-bold shadow-md" }, t.dseModeCta))),
-                React.createElement("div", { className: "mb-4" },
-                    React.createElement("h2", { className: "text-2xl font-bold text-slate-800" }, t.moduleSectionTitle),
-                    React.createElement("p", { className: "text-slate-500 mt-1" }, t.moduleSectionDesc)),
-                React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full" }, moduleCards.map(card => (React.createElement("button", { key: card.displayNo, onClick: () => startPractice(card.startType), className: `bg-white p-6 rounded-2xl shadow-sm ${card.hover} transition-all border-2 border-transparent text-left group relative overflow-hidden hover:-translate-y-0.5` },
+                            React.createElement("h2", { className: "text-xl md:text-2xl font-black mb-1 leading-tight" }, t.dseModeTitle),
+                            React.createElement("p", { className: "text-blue-50 text-sm md:text-base max-w-3xl leading-snug" }, t.dseModeDesc)),
+                        React.createElement("div", { className: "self-start lg:self-center px-4 py-2 bg-white text-blue-700 rounded-xl font-bold shadow-md text-sm md:text-base" }, t.dseModeCta))),
+                React.createElement("div", { className: "mb-3" },
+                    React.createElement("h2", { className: "text-xl md:text-2xl font-bold text-slate-800 leading-tight" }, t.moduleSectionTitle),
+                    React.createElement("p", { className: "text-slate-500 mt-0.5 text-sm md:text-base leading-snug" }, t.moduleSectionDesc)),
+                React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full" }, moduleCards.map(card => (React.createElement("button", { key: card.displayNo, onClick: () => startPractice(card.startType), className: `bg-white p-4 md:p-5 rounded-2xl shadow-sm ${card.hover} transition-all border-2 border-transparent text-left group relative overflow-hidden hover:-translate-y-0.5` },
                     React.createElement("div", { className: `absolute top-0 left-0 w-1.5 h-full ${card.accentBar}` }),
                     React.createElement("div", { className: "flex items-start gap-4" },
-                        React.createElement("div", { className: `w-12 h-12 ${card.badge} rounded-xl flex items-center justify-center text-xl font-bold shrink-0` }, card.displayNo),
+                        React.createElement("div", { className: `w-10 h-10 ${card.badge} rounded-xl flex items-center justify-center text-lg font-bold shrink-0` }, card.displayNo),
                         React.createElement("div", { className: "flex-1 min-w-0" },
                             React.createElement("div", { className: "flex items-center justify-between gap-3 mb-2" },
                                 React.createElement("h3", { className: `text-lg md:text-xl font-bold text-slate-800 transition-colors ${card.titleHover}` }, card.title),
                                 React.createElement("span", { className: "text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 shrink-0" }, t.practiceCount5)),
                             React.createElement("p", { className: "text-slate-700 font-semibold mb-2" }, card.name),
-                            React.createElement("p", { className: "text-sm leading-6 text-slate-500" }, card.desc))))))))));
+                            React.createElement("p", { className: "text-sm leading-5 text-slate-500" }, card.desc))))))))));
     }
     if (appState === 'summary') {
         const dseStats = getDseTypeStats();
@@ -3148,7 +3135,7 @@ const getGivenText = () => {
             })),
         React.createElement("div", { className: "ipad-main-panel w-full max-w-6xl mx-auto flex flex-col md:flex-row bg-white border border-t-0 border-slate-200 rounded-b-xl shadow-sm overflow-hidden" },
             React.createElement("div", { className: "ipad-diagram-pane md:flex-[0_0_44%] p-3 flex justify-center items-center relative border-b md:border-b-0 md:border-r border-slate-100 min-h-[360px]" },
-                React.createElement("svg", { viewBox: "0 0 400 400", className: "w-full h-auto select-none", style: { maxWidth: 360, overflow: 'visible' } },
+                React.createElement("svg", { viewBox: "0 0 400 400", className: "w-full h-auto select-none", style: { maxWidth: 390, overflow: 'visible' } },
                     qData.moduleType === 7 ? (React.createElement("circle", { cx: qData.circleCenter.x, cy: qData.circleCenter.y, r: qData.circleRadius, fill: "none", stroke: "#cbd5e1", strokeWidth: "2.5" })) : (React.createElement("circle", { cx: O.x, cy: O.y, r: R, fill: "none", stroke: "#cbd5e1", strokeWidth: "2.5" })),
                     qData.moduleType === 1 ? (React.createElement("g", null,
                         React.createElement("line", { x1: O.x, y1: O.y, x2: qData.A.x, y2: qData.A.y, stroke: "#64748b", strokeWidth: "1.5" }),

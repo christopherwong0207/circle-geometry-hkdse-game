@@ -114,6 +114,153 @@
                 padding-bottom: calc(96px + env(safe-area-inset-bottom));
             }
         }
+
+
+        /* Compact iPad exam layout: reduce vertical scrolling in fullscreen/PWA use. */
+        .compact-topbar { flex-shrink: 0; }
+        .compact-question-card { flex-shrink: 0; }
+        .dse-question-strip { flex-shrink: 0; }
+        .compact-toolbox { flex-shrink: 0; }
+
+        @media (min-width: 768px) and (pointer: coarse) {
+            html, body, #root {
+                height: 100%;
+                overflow: hidden;
+            }
+
+            .compact-topbar {
+                margin-bottom: 0.35rem !important;
+                padding: 0.45rem 0.75rem !important;
+                border-radius: 0.85rem !important;
+            }
+
+            .compact-topbar h1 {
+                font-size: 1rem !important;
+                line-height: 1.15 !important;
+            }
+
+            .compact-question-card {
+                min-height: 0 !important;
+                padding: 0.55rem 0.75rem !important;
+            }
+
+            .compact-question-card p {
+                font-size: 1rem !important;
+                line-height: 1.35 !important;
+            }
+
+            .dse-question-strip {
+                padding: 0.35rem 0.55rem !important;
+                gap: 0.35rem !important;
+                overflow: hidden;
+            }
+
+            .dse-question-strip .stable-tap-button {
+                min-height: 34px !important;
+                width: 2rem !important;
+                height: 2rem !important;
+                border-radius: 0.55rem !important;
+                font-size: 0.78rem !important;
+                padding: 0 !important;
+            }
+
+            .dse-question-strip .submit-button {
+                min-height: 36px !important;
+                height: 36px !important;
+                width: auto !important;
+                padding: 0 0.85rem !important;
+                font-size: 0.9rem !important;
+            }
+
+            .compact-toolbox {
+                min-height: 42px !important;
+                padding: 0.45rem 0.65rem !important;
+                flex-wrap: nowrap !important;
+            }
+
+            .compact-toolbox span {
+                font-size: 0.78rem !important;
+            }
+
+            .compact-toolbox > div[draggable="true"] {
+                padding: 0.35rem 0.55rem !important;
+                font-size: 0.78rem !important;
+                border-radius: 0.6rem !important;
+            }
+
+            .ipad-main-panel {
+                height: auto;
+                flex: 1 1 auto;
+            }
+
+            .ipad-diagram-pane {
+                flex: 0 0 42% !important;
+                max-width: 42% !important;
+                min-height: 0 !important;
+                padding: 0.55rem !important;
+            }
+
+            .ipad-diagram-pane svg {
+                max-width: 330px !important;
+                max-height: calc(100dvh - 190px) !important;
+            }
+
+            .ipad-side-pane {
+                width: auto !important;
+                max-width: none !important;
+                flex: 1 1 58% !important;
+                padding: 0.75rem !important;
+                overflow-y: auto;
+                overscroll-behavior: contain;
+                padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)) !important;
+            }
+
+            .stable-feedback-card {
+                min-height: 48px !important;
+                margin-bottom: 0.55rem !important;
+                padding: 0.5rem 0.65rem !important;
+                font-size: 0.82rem !important;
+            }
+
+            .mc-heading {
+                margin-bottom: 0.4rem !important;
+                font-size: 0.75rem !important;
+            }
+
+            .mc-options-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 0.5rem !important;
+            }
+
+            .mc-option-button {
+                min-height: 54px !important;
+                padding: 0.65rem 0.85rem !important;
+                font-size: 1.05rem !important;
+                border-radius: 0.85rem !important;
+            }
+
+            .stable-bottom-actions {
+                position: static !important;
+                margin-top: 0.7rem !important;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                background: transparent !important;
+            }
+
+            .stable-bottom-actions .stable-tap-button {
+                min-height: 44px !important;
+                padding-top: 0.55rem !important;
+                padding-bottom: 0.55rem !important;
+                font-size: 0.95rem !important;
+            }
+
+            .stable-solution-card {
+                min-height: 180px !important;
+                margin-top: 0.7rem !important;
+                padding: 0.75rem !important;
+            }
+        }
+
     </style>
 </head>
 <body class="bg-slate-50 touch-manipulation">
@@ -2928,11 +3075,11 @@ const getGivenText = () => {
                     qData.moduleType === 5 ? t.homeType5 :
                         qData.moduleType === 6 ? t.homeType6 :
                             qData.moduleType === 7 ? t.homeType7 : qData.moduleType === 8 ? t.homeType8 : t.homeType9;
-    return (React.createElement("div", { className: "ipad-practice-shell min-h-screen flex flex-col p-2 md:p-6 font-sans text-slate-800 animate-in fade-in duration-300" },
-        React.createElement("div", { className: "w-full max-w-6xl mx-auto flex justify-between items-center mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200" },
+    return (React.createElement("div", { className: "ipad-practice-shell min-h-screen flex flex-col p-2 md:p-3 font-sans text-slate-800 animate-in fade-in duration-300" },
+        React.createElement("div", { className: "compact-topbar w-full max-w-6xl mx-auto flex justify-between items-center mb-2 bg-white p-3 rounded-xl shadow-sm border border-slate-200" },
             React.createElement("div", null,
                 React.createElement("div", { className: "flex items-center gap-2 flex-wrap" },
-                    React.createElement("h1", { className: "text-xl md:text-2xl font-bold text-slate-800" }, moduleTitle),
+                    React.createElement("h1", { className: "text-lg md:text-xl font-bold text-slate-800" }, moduleTitle),
                     practiceMode === 'dse' && React.createElement("span", { className: "px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs md:text-sm font-bold" }, t.dseModeTitle))),
             React.createElement("div", { className: "flex items-center gap-3 md:gap-6" },
                 React.createElement("button", { onClick: toggleFullscreen, className: "stable-tap-button flex items-center gap-1.5 px-3 py-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors" },
@@ -2949,8 +3096,8 @@ const getGivenText = () => {
                         React.createElement("span", { className: "text-slate-400 text-sm md:text-lg" },
                             "/ ",
                             totalQuestions))))),
-        React.createElement("div", { className: "ipad-question-card w-full max-w-6xl mx-auto p-4 md:p-5 bg-white border border-slate-200 rounded-t-xl shadow-sm" },
-            React.createElement("p", { className: "text-lg md:text-xl font-medium" },
+        React.createElement("div", { className: "compact-question-card ipad-question-card w-full max-w-6xl mx-auto p-3 md:p-3 bg-white border border-slate-200 rounded-t-xl shadow-sm" },
+            React.createElement("p", { className: "text-base md:text-lg font-medium leading-relaxed" },
                 baseText,
                 " ",
                 t.givenStr,
@@ -2961,18 +3108,18 @@ const getGivenText = () => {
                 " ",
                 React.createElement("span", { className: "font-bold border-b-2 border-blue-400" }, getFindText()),
                 "\u3002")),
-        practiceMode === 'dse' && React.createElement("div", { className: "w-full max-w-6xl mx-auto bg-white border-x border-b border-slate-200 px-3 py-2 flex flex-wrap gap-2 items-center" },
+        practiceMode === 'dse' && React.createElement("div", { className: "dse-question-strip w-full max-w-6xl mx-auto bg-white border-x border-b border-slate-200 px-2 py-1.5 flex flex-wrap gap-1.5 items-center" },
             React.createElement("div", { className: "flex flex-wrap gap-1.5 items-center flex-1 min-w-0" }, Array.from({ length: totalQuestions }, (_, idx) => {
                 const saved = dseAnswers[idx];
                 const current = idx + 1 === qIndex;
                 const result = dseSubmitted && dseQuestionBank[idx] ? saved === dseQuestionBank[idx].answer : null;
                 const cls = current ? 'bg-blue-600 text-white border-blue-600' : dseSubmitted ? (result ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-rose-50 text-rose-700 border-rose-300') : (saved !== null && saved !== undefined ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-white text-slate-500 border-slate-200');
-                return React.createElement("button", { key: idx, onClick: () => loadDseQuestion(idx + 1, dseSubmitted), className: `stable-tap-button w-9 h-9 rounded-lg border text-sm font-black ${cls}` }, idx + 1);
+                return React.createElement("button", { key: idx, onClick: () => loadDseQuestion(idx + 1, dseSubmitted), className: `stable-tap-button w-8 h-8 rounded-lg border text-xs font-black ${cls}` }, idx + 1);
             })),
             React.createElement("div", { className: "ml-auto flex items-center gap-2" },
                 React.createElement("span", { className: "hidden sm:inline text-xs font-bold text-slate-500 whitespace-nowrap" }, lang === 'zh' ? `已答 ${dseAnswers.filter(a => a !== null && a !== undefined).length}/20` : `Answered ${dseAnswers.filter(a => a !== null && a !== undefined).length}/20`),
-                !dseSubmitted && React.createElement("button", { onClick: submitDsePractice, className: "stable-tap-button px-4 py-2.5 rounded-xl text-sm md:text-base font-black shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white whitespace-nowrap" }, lang === 'zh' ? '提交' : 'Submit'))),
-        React.createElement("div", { className: "ipad-toolbox w-full max-w-6xl mx-auto bg-blue-50 p-3 border-x border-b border-slate-200 shadow-sm flex flex-wrap gap-2 items-center" },
+                !dseSubmitted && React.createElement("button", { onClick: submitDsePractice, className: "submit-button stable-tap-button px-4 py-2 rounded-xl text-sm md:text-base font-black shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white whitespace-nowrap" }, lang === 'zh' ? '提交' : 'Submit'))),
+        React.createElement("div", { className: "compact-toolbox ipad-toolbox w-full max-w-6xl mx-auto bg-blue-50 p-2 border-x border-b border-slate-200 shadow-sm flex flex-wrap gap-2 items-center" },
             React.createElement("span", { className: "text-sm font-bold text-blue-800 mr-2" }, t.toolbox),
             THEOREMS.map(key => {
                 if (qData.moduleType === 1 && !['t_radii', 't_point', 't_chord', 't_iso', 't_tri_sum', 't_center', 't_adj'].includes(key))
@@ -3000,8 +3147,8 @@ const getGivenText = () => {
                                     ` }, t.theorems[key]));
             })),
         React.createElement("div", { className: "ipad-main-panel w-full max-w-6xl mx-auto flex flex-col md:flex-row bg-white border border-t-0 border-slate-200 rounded-b-xl shadow-sm overflow-hidden" },
-            React.createElement("div", { className: "ipad-diagram-pane flex-1 p-6 flex justify-center items-center relative border-b md:border-b-0 md:border-r border-slate-100 min-h-[450px]" },
-                React.createElement("svg", { viewBox: "0 0 400 400", className: "w-full h-auto select-none", style: { maxWidth: 430, overflow: 'visible' } },
+            React.createElement("div", { className: "ipad-diagram-pane md:flex-[0_0_44%] p-3 flex justify-center items-center relative border-b md:border-b-0 md:border-r border-slate-100 min-h-[360px]" },
+                React.createElement("svg", { viewBox: "0 0 400 400", className: "w-full h-auto select-none", style: { maxWidth: 360, overflow: 'visible' } },
                     qData.moduleType === 7 ? (React.createElement("circle", { cx: qData.circleCenter.x, cy: qData.circleCenter.y, r: qData.circleRadius, fill: "none", stroke: "#cbd5e1", strokeWidth: "2.5" })) : (React.createElement("circle", { cx: O.x, cy: O.y, r: R, fill: "none", stroke: "#cbd5e1", strokeWidth: "2.5" })),
                     qData.moduleType === 1 ? (React.createElement("g", null,
                         React.createElement("line", { x1: O.x, y1: O.y, x2: qData.A.x, y2: qData.A.y, stroke: "#64748b", strokeWidth: "1.5" }),
@@ -3177,7 +3324,7 @@ const getGivenText = () => {
                         const textPos = { x: baseTextPos.x + (config.textDx || 0), y: baseTextPos.y + (config.textDy || 0) };
                         return React.createElement("text", { x: textPos.x, y: textPos.y, fill: config.color, fontSize: "15", fontWeight: "bold", textAnchor: "middle", dominantBaseline: "middle", stroke: "#ffffff", strokeWidth: "5", strokeLinejoin: "round", style: { paintOrder: "stroke", pointerEvents: "none" } }, `${config.val}°`);
                     })())),
-            React.createElement("div", { className: "ipad-side-pane flex-1 p-5 md:p-8 flex flex-col" },
+            React.createElement("div", { className: "ipad-side-pane flex-1 p-4 md:p-5 flex flex-col" },
                 React.createElement("div", { className: `stable-feedback-card mb-6 p-3 rounded-lg flex items-start gap-2 text-sm font-medium ${feedback.type === 'info' ? 'bg-slate-50 text-slate-600 border border-slate-200' :
                         feedback.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
                             'bg-rose-50 text-rose-700 border border-rose-200'}` },
@@ -3186,11 +3333,11 @@ const getGivenText = () => {
                         feedback.type === 'error' && React.createElement(XIcon, null),
                         feedback.type === 'info' && React.createElement(AlertIcon, null)),
                     React.createElement("p", { style: { whiteSpace: "pre-line" } }, feedback.text)),
-                React.createElement("h3", { className: "text-sm font-bold text-slate-400 uppercase tracking-wider mb-3" }, t.selectAnswer),
-                React.createElement("div", { className: "grid grid-cols-1 gap-3" }, qData.options.map((opt, i) => {
+                React.createElement("h3", { className: "mc-heading text-sm font-bold text-slate-400 uppercase tracking-wider mb-2" }, t.selectAnswer),
+                React.createElement("div", { className: "mc-options-grid grid grid-cols-1 md:grid-cols-2 gap-2" }, qData.options.map((opt, i) => {
                     const isSelected = selectedAnswer === opt;
                     const isCorrect = opt === qData.answer;
-                    let btnClass = "py-4 px-5 rounded-xl border-2 text-lg font-bold flex justify-between items-center transition-all ";
+                    let btnClass = "mc-option-button py-3 px-4 rounded-xl border-2 text-base md:text-lg font-bold flex justify-between items-center transition-all ";
                     if (practiceMode === 'dse' && !dseSubmitted) {
                         btnClass += isSelected ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 hover:border-blue-400 hover:bg-blue-50 text-slate-700";
                     }
